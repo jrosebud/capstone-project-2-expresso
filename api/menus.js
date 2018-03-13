@@ -33,56 +33,52 @@ menusRouter.get('/', (req, res, next) => {
 	); //close db.all
 });
 
-//get route for single employee
-/*employeesRouter.get('/:id', (req, res, next) => {
-	db.get('SELECT * FROM Employee WHERE Employee.id = $employeeId',
+//get route for single menu
+menusRouter.get('/:menuId', (req, res, next) => {
+	db.get('SELECT * FROM Menu WHERE Menu.id = $menuId',
 	{
-		$employeeId: req.params.id
+		$menuId: req.params.menuId
 	},
-	(error, employee) => {
+	(error, menu) => {
 		if(error) {
 			next(error);
-		} else if (employee) {
-			res.status(200).json({employee: employee});
+		} else if (menu) {
+			res.status(200).json({menu: menu});
 		} else {
 			return res.status(404).send();
 		}
 	});
 });
 
-//post route for employees
-employeesRouter.post('/', (req, res, next) => {
+//post route for menus
+menusRouter.post('/', (req, res, next) => {
 	//variables for information
-	const name = req.body.employee.name;
-	const position = req.body.employee.position;
-	const wage = req.body.employee.wage;
+	const title = req.body.menu.title;
 	// check for empty fields
-	if(!name || !position || !wage) {
+	if(!title) {
 		return res.status(400).send();
 	} 
 	
 	// run the queries, yo
-	const sql = "INSERT INTO Employee (name, position, wage) VALUES ($name, $position, $wage)";
+	const sql = "INSERT INTO Menu (title) VALUES ($title)";
 	const values = {
-		$name: name,
-		$position: position,
-		$wage: wage
+		$title: title
 	}
 	db.run(sql, values, function(error){
 		if(error){
 			next(error);
 		} else {
 			db.get(
-				`SELECT * FROM Employee WHERE Employee.id = ${this.lastID}`,
-				(error, employee) => {
-					res.status(201).json({employee: employee});
+				`SELECT * FROM Menu WHERE Menu.id = ${this.lastID}`,
+				(error, menu) => {
+					res.status(201).json({menu: menu});
 				});
 		}
 	});
 });
-
+/*
 //put route for employees
-employeesRouter.put('/:id', (req, res, next) => {
+menusRouter.put('/:id', (req, res, next) => {
 	//variables for information
 	const name = req.body.employee.name;
 	const position = req.body.employee.position;
@@ -115,7 +111,7 @@ employeesRouter.put('/:id', (req, res, next) => {
 });
 
 //delete route for employees
-employeesRouter.delete('/:id', (req, res, next) => {
+menusRouter.delete('/:id', (req, res, next) => {
 	const sql = "UPDATE Employee SET is_current_employee = 0 WHERE Employee.id = $employeeId";
 	const values = {
 		$employeeId: req.params.id
@@ -135,7 +131,7 @@ employeesRouter.delete('/:id', (req, res, next) => {
 
 //timesheet stuff
 //timesheet params
-employeesRouter.param('timesheetId', (req, res, next, timesheetId) => {
+menusRouter.param('timesheetId', (req, res, next, timesheetId) => {
   const sql = 'SELECT * FROM Timesheet WHERE Timesheet.id = $timesheetId';
   const values = {$timesheetId: timesheetId};
   db.get(sql, values, (error, timesheet) => {
@@ -152,7 +148,7 @@ employeesRouter.param('timesheetId', (req, res, next, timesheetId) => {
 
 
 //get timesheet for employee
-employeesRouter.get('/:employeeId/timesheets', (req, res, next) => {
+menusRouter.get('/:employeeId/timesheets', (req, res, next) => {
 	db.all("SELECT * FROM Timesheet WHERE employee_id = $employeeId",
 	{
 		$employeeId: req.params.employeeId
@@ -169,7 +165,7 @@ employeesRouter.get('/:employeeId/timesheets', (req, res, next) => {
 });
 
 //post timesheet for employee
-employeesRouter.post('/:employeeId/timesheets', (req, res, next) => {
+menusRouter.post('/:employeeId/timesheets', (req, res, next) => {
 	//variables for information
 	const employeeId = req.params.employeeId;
 	const hours = req.body.timesheet.hours;
@@ -202,7 +198,7 @@ employeesRouter.post('/:employeeId/timesheets', (req, res, next) => {
 });
 
 //put timesheet
-employeesRouter.put('/:employeeId/timesheets/:timesheetId', (req, res, next) => {
+menusRouter.put('/:employeeId/timesheets/:timesheetId', (req, res, next) => {
 	//variables for information
 	const employeeId = req.params.employeeId;
 	const hours = req.body.timesheet.hours;
@@ -236,7 +232,7 @@ employeesRouter.put('/:employeeId/timesheets/:timesheetId', (req, res, next) => 
 });
 
 //delete route for timesheets
-employeesRouter.delete('/:employeeId/timesheets/:timesheetId', (req, res, next) => {
+menusRouter.delete('/:employeeId/timesheets/:timesheetId', (req, res, next) => {
 	const sql = "DELETE FROM Timesheet WHERE Timesheet.id = $timesheetId";
 	const values = {
 		$timesheetId: req.params.timesheetId
